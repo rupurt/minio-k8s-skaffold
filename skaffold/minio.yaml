@@ -1,0 +1,32 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: minio
+deploy:
+  helm:
+    hooks:
+      before:
+      - host:
+          command:
+          - 'bash'
+          - '-c'
+          - 'helm repo add minio-operator https://operator.min.io'
+    releases:
+    - name: minio-operator
+      remoteChart: minio-operator/operator
+      namespace: minio-k8s-skaffold
+      createNamespace: true
+    - name: minio-tenant
+      # chartPath: helm/minio-tenant
+      remoteChart: minio-operator/tenant
+      valuesFiles:
+        - minio-tenant.yaml
+      namespace: minio-k8s-skaffold
+      createNamespace: true
+# portForward:
+# - resourceType: service
+#   resourceName: minio-tenant
+#   namespace: minio-k8s-skaffold
+#   address: 0.0.0.0
+#   port: 9000
+#   localPort: 9000

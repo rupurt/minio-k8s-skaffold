@@ -1,0 +1,22 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: o11y
+deploy:
+  helm:
+    releases:
+    - name: prometheus
+      chartPath: helm/o11y/prometheus
+      namespace: mainflame
+      createNamespace: true
+    - name: grafana
+      chartPath: helm/o11y/grafana
+      namespace: mainflame
+      createNamespace: true
+portForward:
+- resourceType: service
+  resourceName: grafana
+  namespace: mainflame
+  address: 0.0.0.0
+  port: 3000
+  localPort: 3000

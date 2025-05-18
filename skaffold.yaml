@@ -1,0 +1,11 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: MinIO k8s Skaffold
+requires:
+  - configs:
+      - o11y
+    path: skaffold/o11y.yaml
+  - configs:
+      - kafka
+    path: skaffold/minio.yaml

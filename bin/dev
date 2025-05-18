@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+source $SCRIPTS/common.sh
+
+# @cmd Ensures configuration has been initialized
+setup() {
+	mkdir -p $LOCAL
+}
+
+# @cmd Manage local k3d cluster
+k3d() { :; }
+
+# @cmd Create k3d cluster
+k3d::create() {
+	runp """
+  k3d cluster create minio-k8s-skaffold \
+    --image rancher/k3s:v1.31.4-k3s1 \
+    --k3s-arg '--disable=traefik@server:*' \
+    --port '80:80@loadbalancer'
+  """
+}
+
+# @cmd Delete k3d cluster
+k3d::delete() {
+	runp "k3d cluster delete minio-k8s-skaffold"
+}
+
+# @cmd Start k3d cluster
+k3d::start() {
+	runp "k3d cluster start minio-k8s-skaffold"
+}
+
+# @cmd Stop k3d cluster
+k3d::stop() {
+	runp "k3d cluster stop minio-k8s-skaffold"
+}
+
+# @cmd Continuous development for kubernetes
+skaffold() { :; }
+
+# @cmd Continuous development for all pipelines
+skaffold::all() { :; }
+
+# @cmd Run all pipeline once
+skaffold::all::run() {
+	runp """
+  skaffold run \
+    --port-forward=user \
+    -f skaffold.yaml
+  """
+}
+
+# @cmd Generate manifests for all pipeline
+skaffold::all::render() {
+	runp """
+  skaffold render \
+    -f skaffold.yaml
+  """
+}
+
+# @cmd Delete resources deployed by all pipeline
+skaffold::all::delete() {
+	runp """
+  skaffold delete \
+    -f skaffold.yaml
+  """
+}
+
+# @cmd Continuous development for o11y pipeline
+skaffold::o11y() { :; }
+
+# @cmd Run o11y pipeline once
+skaffold::o11y::run() {
+	runp """
+  skaffold run \
+    --port-forward=user \
+    -f skaffold/o11y.yaml
+  """
+}
+
+# @cmd Generate manifests for o11y pipeline
+skaffold::o11y::render() {
+	runp """
+  skaffold render \
+    -f skaffold/o11y.yaml
+  """
+}
+
+# @cmd Delete resources deployed by o11y pipeline
+skaffold::o11y::delete() {
+	runp """
+  skaffold delete \
+    -f skaffold/o11y.yaml
+  """
+}
+
+# @cmd Continuous development for minio pipeline
+skaffold::minio() { :; }
+
+# @cmd Run minio pipeline once
+skaffold::minio::run() {
+	runp """
+  skaffold run \
+    --port-forward=user \
+    -f skaffold/minio.yaml
+  """
+}
+
+# @cmd Generate manifests for minio pipeline
+skaffold::minio::render() {
+	runp """
+  skaffold render \
+    -f skaffold/minio.yaml
+  """
+}
+
+# @cmd Delete resources deployed by minio pipeline
+skaffold::minio::delete() {
+	runp """
+  skaffold delete \
+    -f skaffold/minio.yaml
+  """
+}
+
+# Parse args and apply them to the specified function
+dev --ensure-devshell "$@"
