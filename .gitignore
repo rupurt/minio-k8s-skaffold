@@ -1,0 +1,10 @@
+# Editors
+.idea
+
+# Env
+/.direnv
+/.local
+
+# Nix
+/.nix
+/result
